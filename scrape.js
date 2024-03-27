@@ -2,6 +2,17 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const fs = require('fs').promises;
 
+const admin = require('firebase-admin');
+
+const serviceAccount = require('C:/Users/fquad/OneDrive/Documents/DriveNow/drivenowdatascraper-firebase-adminsdk-o5ll0-109a2f19fa.json');
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
+
+const db = admin.firestore();
+
+
 async function scrapeWebsite(url) {
   try {
     // Get HTML content, load the content and make array to hold data
@@ -43,27 +54,29 @@ async function scrapeAndSaveData() {
   let hasMorePages = true;
   const allCars = [];
 
-  // Loop through all pages
   while (hasMorePages) {
     const url = `https://drivenowmotors.com/inventory?clearall=1&page=${currentPage}`;
     const cars = await scrapeWebsite(url);
-    // If cars are found, add to array and go to next page
     if (cars.length > 0) {
       allCars.push(...cars);
       currentPage++;
     } else {
-      // No more cars
       hasMorePages = false;
       console.log('Finished scraping. No more data.');
     }
   }
 
-  // Save all data about cars into a JSON file
+  // Save all data about cars into Firestore
   try {
-    await fs.writeFile('scrapedData.json', JSON.stringify(allCars, null, 2));
-    console.log('Data successfully saved to scrapedData.json');
+    const batch = db.batch();
+    allCars.forEach((car) => {
+      const docRef = db.collection('cars').doc(); // Generate unique ID for each car
+      batch.set(docRef, car);
+    });
+    await batch.commit();
+    console.log('Data successfully saved to Firestore');
   } catch (error) {
-    console.error('Error writing file:', error);
+    console.error('Error writing to Firestore:', error);
   }
 }
 
