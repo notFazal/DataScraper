@@ -1,7 +1,8 @@
 node_modules
 tempCodeRunnerFile.js
 test.js
-scrapedDataTest.json
+scraped_cars.json
+backUpScrape.js
 package-lock.json
 package.json
 .gitignore
