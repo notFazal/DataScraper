@@ -28,10 +28,6 @@ async function scrapeWebsite(url) {
       let title = titleElement.clone().children().remove().end().text().trim();
       const yearMatch = title.match(/\b\d{4}\b/);
       const year = yearMatch ? yearMatch[0] : 'Unknown Year';  
-      let remainingTitle = title.replace(year, '').trim();
-      const makeModelSplit = remainingTitle.split(' ');
-      const make = makeModelSplit.shift(); 
-      const model = makeModelSplit.join(' '); 
       const trim = $(element).find('h4.i10r_vehicleTitle span.vehicleTrim').text().trim();
       const listing = 'https://drivenowmotors.com' + (titleElement.attr('href') || 'No listing found');
       const color = $(element).find('p.i10r_optColor').text().replace('Color:', '').trim();
@@ -44,8 +40,8 @@ async function scrapeWebsite(url) {
       
       
       // Add the scraped data to array
-      scrapedData.push({ imageUrl, title, year, make, model, trim, listing, color, drive, trans, vin, engine, mileage, stock });
-});
+      scrapedData.push({ imageUrl, title, year, trim, listing, color, drive, trans, vin, engine, mileage, stock });
+    });
 
     return scrapedData;
   } catch (error) {
@@ -100,7 +96,7 @@ async function scrapeAndSaveData() {
       batch.set(docRef, car);
     }
   });
-  
+
   // Commit the batch operation
   try {
     await batch.commit();

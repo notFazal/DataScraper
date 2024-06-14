@@ -3,7 +3,7 @@ COMMITS
 V0.1 pulls all data
 V1.0 Scrapes Data W/C
 V1.1 Scrapes Data to Firebase W/C
-
+V1.2 Added Year, Make, Model and scapes locally
 
 npm install cheerio  // For making HTTP requests
 npm install axios    // For parsing and manipulating HTML
