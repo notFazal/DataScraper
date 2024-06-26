@@ -27,7 +27,7 @@ async function scrapeWebsite(url) {
       const titleElement = $(element).find('h4.i10r_vehicleTitle a');
       let title = titleElement.clone().children().remove().end().text().trim();
       const yearMatch = title.match(/\b\d{4}\b/);
-      const year = yearMatch ? yearMatch[0] : 'Unknown Year';  
+      const year = yearMatch ? parseInt(yearMatch[0]) : null;  
       const trim = $(element).find('h4.i10r_vehicleTitle span.vehicleTrim').text().trim();
       const listing = 'https://drivenowmotors.com' + (titleElement.attr('href') || 'No listing found');
       const color = $(element).find('p.i10r_optColor').text().replace('Color:', '').trim();
@@ -35,7 +35,7 @@ async function scrapeWebsite(url) {
       const trans = $(element).find('p.i10r_optTrans').text().replace('Trans:', '').trim();
       const vin = $(element).find('p.i10r_optVin').text().replace('VIN:', '').trim();
       const engine = $(element).find('p.i10r_optEngine').text().replace('Engine:', '').trim();
-      const mileage = $(element).find('p.i10r_optMileage').text().replace('Mileage:', '').trim();
+      const mileage = parseInt($(element).find('p.i10r_optMileage').text().replace('Mileage:', '').replace(/,/g, '').trim());
       const stock = $(element).find('p.i10r_optStock').text().replace('Stock #:', '').trim();
       
       
@@ -75,7 +75,6 @@ async function scrapeAndSaveData() {
   const carMap = new Map(allCars.map(car => [car.vin, car]));
 
   // Get all cars currently in Firestore
-
   const carsSnapshot = await db.collection('cars').get();
   const batch = db.batch();
 

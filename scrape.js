@@ -27,7 +27,7 @@ async function scrapeWebsite(url) {
       const titleElement = $(element).find('h4.i10r_vehicleTitle a');
       let title = titleElement.clone().children().remove().end().text().trim();
       const yearMatch = title.match(/\b\d{4}\b/);
-      const year = yearMatch ? yearMatch[0] : 'Unknown Year';  
+      const year = yearMatch ? parseInt(yearMatch[0]) : null;  
       let remainingTitle = title.replace(year, '').trim();
       const makeModelSplit = remainingTitle.split(' ');
       const make = makeModelSplit.shift(); 
@@ -39,12 +39,15 @@ async function scrapeWebsite(url) {
       const trans = $(element).find('p.i10r_optTrans').text().replace('Trans:', '').trim();
       const vin = $(element).find('p.i10r_optVin').text().replace('VIN:', '').trim();
       const engine = $(element).find('p.i10r_optEngine').text().replace('Engine:', '').trim();
-      const mileage = $(element).find('p.i10r_optMileage').text().replace('Mileage:', '').trim();
+      const mileageString = $(element).find('p.i10r_optMileage').text().replace('Mileage:', '').trim();
+      const mileage = mileageString ? parseInt(mileageString.replace(/[^0-9]/g, ''), 10) : 0;
       const stock = $(element).find('p.i10r_optStock').text().replace('Stock #:', '').trim();
-      
+      const priceString = $(element).find('div.i10r_priceWrap div.retailWrap span.price-2').text().trim();
+      const price = priceString ? parseInt(priceString.replace(/[^0-9]/g, ''), 10) : 0;
+
       
       // Add the scraped data to array
-      scrapedData.push({ imageUrl, title, year, make, model, trim, listing, color, drive, trans, vin, engine, mileage, stock });
+      scrapedData.push({ imageUrl, title, year, make, model, trim, listing, price, color, drive, trans, vin, engine, mileage, stock });
 });
 
     return scrapedData;
